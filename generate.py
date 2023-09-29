@@ -1,38 +1,31 @@
 from pymol import cmd
-import math
+from typing import Tuple
+from pathlib import Path
+from itertools import product
 
-
-# Define the function to rotate the protein view using spherical coordinates
-def rotate_protein_view_spherical(pdb_id, spherical_rotation, output_filename):
-    # Create a visualization
+def rotate_protein_view_spherical(pdb_id: str, rotation: Tuple[float, float, float], output_dir: Path):
     cmd.show('surface')
     cmd.color('white')
 
-    # Zoom to fit the protein in the view
-    cmd.zoom('all', 0.6)
+    rx, ry, rz = rotation
+    cmd.turn('x', rx)
+    cmd.turn('y', ry)
+    cmd.turn('z', rz)
 
-    # Convert spherical coordinates to Cartesian coordinates
-    azimuth, elevation = math.radians(spherical_rotation[0]), math.radians(spherical_rotation[1])
-    x = math.sin(azimuth) * math.cos(elevation)
-    y = math.sin(azimuth) * math.sin(elevation)
-    z = math.cos(azimuth)
-
-    # Rotate the view using the Cartesian coordinates
-    cmd.rotate([x, y, z], 0)
-
-    # Save the rendered image
-    cmd.png(output_filename, width=128, height=128, dpi=100)
+    output_dir_pdb_id = output_dir / pdb_id
+    output_dir_pdb_id.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir_pdb_id / f"{rz}.{ry}.{rz}.png"
+    cmd.png(str(output_path), width=128, height=128, dpi=100)
 
 
 def main():
-  # Start PyMOL and load your protein structure
-  cmd.fetch('1A2K', 'https://files.rcsb.org/download/1A2K.pdb')
-  # Example usage:
-  spherical_rotation = (60, 120)  # Replace with your desired spherical rotation angles (azimuth, elevation) in degrees
-  output_file = 'output_image2.png'  # Replace with your desired output file name
+    cmd.fetch('1A2K', 'https://files.rcsb.org/download/1A2K.pdb')
 
-  # Call the function to rotate and render the protein view
-  rotate_protein_view_spherical('1A2K', spherical_rotation, output_file)
+    output_dir = Path("data/images/")
+
+    angles = list(range(0, 360, 10))
+    for rx, ry, rz in product(*([angles] * 3)):
+        rotate_protein_view_spherical("1A2K", (rx, ry, rz), output_dir)
 
 
 main()
