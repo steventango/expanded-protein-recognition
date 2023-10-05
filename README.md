@@ -1,5 +1,5 @@
 # Expanded Protein Recognition
 
 ```bash
-pymol -cq generate.py
+pymol -c generate.py
 ```

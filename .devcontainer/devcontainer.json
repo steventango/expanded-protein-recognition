@@ -9,6 +9,9 @@
 			"dockerfile": "Dockerfile"
 	},
 
+	"containerEnv": {
+		"DISPLAY": "${localEnv:DISPLAY}"
+	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
 
@@ -30,14 +33,18 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"ms-toolsai.jupyter",
-				"wakatime.vscode-wakatime"
 			]
 		}
 	},
 
 	"runArgs": [
 		"--gpus",
-		"all"
+		"all",
+		"--network=host",
+		"-v",
+		"/tmp/.X11-unix:/tmp/.X11-unix",
+		"-v",
+		"/home/steven/.Xauthority:/root/.Xauthority"
 	],
 
 	"mounts": [
